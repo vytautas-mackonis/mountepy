@@ -6,6 +6,7 @@ Can detect Mountebank installed in the system and also download and setup a stan
 from functools import lru_cache
 import logging
 import os
+import platform
 import subprocess
 import tarfile
 import urllib
@@ -44,8 +45,16 @@ def _setup_standalone():
     Standalone distribution also contains NodeJS.
     """
     _log.info('Setting up a standalone Mountebank.')
-    mb_archive_path, _ = urllib.request.urlretrieve(
-        'https://s3.amazonaws.com/mountebank/v1.4/mountebank-v1.4.3-linux-x64.tar.gz')
+    os_type = platform.system()
+    if os_type == 'Linux':
+        mb_archive_path, _ = urllib.request.urlretrieve(
+            'https://s3.amazonaws.com/mountebank/v1.13/mountebank-v1.13.0-linux-x64.tar.gz')
+    elif os_type == 'Darwin':
+        mb_archive_path, _ = urllib.request.urlretrieve(
+            'https://s3.amazonaws.com/mountebank/v1.13/mountebank-v1.13.0-darwin-x64.tar.gz')
+    else:
+        raise Error('Unsupported OS')
+
     mb_tar = tarfile.open(mb_archive_path, mode='r:gz')
     mb_tar.extractall(CACHE_DIR)
 
